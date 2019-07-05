@@ -112,7 +112,11 @@ def _get_efficient_unet(encoder, out_channels=2, block_type='upsampling', concat
         o = UpBlock(32, initializer=conv_kernel_initializer, skip=blocks.pop())(o)
     else:
         o = UpBlock(32, initializer=conv_kernel_initializer, skip=None)(o)
-    o = Conv2D(out_channels, (1, 1), padding='same', kernel_initializer=conv_kernel_initializer)(o)
+    
+    if out_channels == 1:
+        o = Conv2D(out_channels, (1, 1), activation="sigmoid", padding='same', kernel_initializer=conv_kernel_initializer)(o)
+    else:
+        o = Conv2D(out_channels, (1, 1), activation="softmax", padding='same', kernel_initializer=conv_kernel_initializer)(o)
 
     model = models.Model(encoder.input, o)
 
